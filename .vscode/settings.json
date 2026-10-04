@@ -1,0 +1,17 @@
+{
+    "dotnet.defaultSolution": "Inventory.slnx",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true
+    },
+    "dotnet.server.useOmnisharp": false,
+    "rest-client.environmentVariables": {
+        "$shared": {
+            "baseUrl": "http://localhost:5000"
+        }
+    }
+}
