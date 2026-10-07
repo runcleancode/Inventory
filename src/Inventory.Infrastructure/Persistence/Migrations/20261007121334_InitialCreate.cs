@@ -1,35 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Inventory.Infrastructure.Persistence.Migrations
+namespace Inventory.Infrastructure.Persistence.Migrations;
+
+/// <inheritdoc />
+public partial class InitialCreate : Migration
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateTable(
-                name: "products",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_products", x => x.id);
-                });
-        }
+        migrationBuilder.CreateTable(
+            name: "products",
+            columns: table => new
+            {
+                id = table.Column<int>(type: "integer", nullable: false)
+                    .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_products", x => x.id);
+            });
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "products");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropTable(
+            name: "products");
     }
 }

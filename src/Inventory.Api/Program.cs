@@ -1,5 +1,4 @@
-using Inventory.Application.Interfaces;
-using Inventory.Application.Services;
+using Inventory.Application;
 using Inventory.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,11 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 // --- Services ---
 builder.Services.AddControllers();
 
+// Application (services, DTOs, interfaces)
+builder.Services.AddApplication();
+
 // Infrastructure (DbContext, repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
-
-// Application services
-builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
