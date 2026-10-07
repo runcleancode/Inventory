@@ -34,6 +34,7 @@ Dependency direction: `Api → Application → Domain`, `Infrastructure → Appl
 ```bash
 docker compose up -d
 dotnet run --project src/Inventory.Api
+```
 
 ## Project Status
 
