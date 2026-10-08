@@ -18,6 +18,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     // Swagger/OpenAPI will be added later as a schema-only endpoint.
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
