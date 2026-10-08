@@ -8,7 +8,7 @@ namespace Inventory.Api.Controllers;
 [ApiController]
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetProductById")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDto>> GetByIdAsync(int id, CancellationToken cancellationToken)
@@ -22,4 +22,18 @@ public sealed class ProductsController(IProductService productService) : Control
 
         return Ok(product);
     }
+
+    [HttpPost]
+    [ProducesResponseType<ProductDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ProductDto>> CreateAsync(CreateProductDto dto, CancellationToken cancellationToken)
+    {
+        ProductDto created = await productService.CreateAsync(dto, cancellationToken);
+
+        return CreatedAtRoute(
+            routeName: "GetProductById",
+            routeValues: new { id = created.Id },
+            value: created);
+    }
 }
+

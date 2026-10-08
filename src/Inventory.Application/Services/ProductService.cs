@@ -13,6 +13,15 @@ public sealed class ProductService : IProductService
         _productRepository = productRepository;
     }
 
+    public async Task<ProductDto> CreateAsync(CreateProductDto dto, CancellationToken cancellationToken = default)
+    {
+        Product product = new(dto.Name);
+
+        Product created = await _productRepository.AddAsync(product, cancellationToken);
+
+        return MapToDto(created);
+    }
+
     public async Task<ProductDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
@@ -22,6 +31,11 @@ public sealed class ProductService : IProductService
             return null;
         }
 
+        return MapToDto(product);
+    }
+
+    private static ProductDto MapToDto(Product product)
+    {
         return new ProductDto(product.Id, product.Name);
     }
 }
