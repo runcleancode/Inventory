@@ -50,6 +50,20 @@ public sealed class ProductService : IProductService
         return MapToDto(product);
     }
 
+    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+    {
+        Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
+
+        if (product is null)
+        {
+            return false;
+        }
+
+        await _productRepository.DeleteAsync(product, cancellationToken);
+
+        return true;
+    }
+
     private static ProductDto MapToDto(Product product)
     {
         return new ProductDto(product.Id, product.Name);
