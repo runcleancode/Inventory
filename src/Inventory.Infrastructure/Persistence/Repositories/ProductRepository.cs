@@ -20,4 +20,10 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
             .AsNoTracking()
             .FirstOrDefaultAsync(product => product.Id == id, cancellationToken);
     }
+
+    public async Task UpdateAsync(Product product, CancellationToken cancellationToken = default)
+    {
+        context.Products.Update(product);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 }

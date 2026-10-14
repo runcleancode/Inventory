@@ -1,5 +1,6 @@
 using Inventory.Application.DTOs;
 using Inventory.Application.Interfaces;
+using Inventory.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.Api.Controllers;
@@ -34,6 +35,22 @@ public sealed class ProductsController(IProductService productService) : Control
             routeName: "GetProductById",
             routeValues: new { id = created.Id },
             value: created);
+    }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProductDto>> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken)
+    {
+        ProductDto? updated = await productService.UpdateAsync(id, dto, cancellationToken);
+
+        if (updated is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(updated);
     }
 }
 

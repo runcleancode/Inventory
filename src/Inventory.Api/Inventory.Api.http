@@ -13,5 +13,21 @@ POST {{baseUrl}}/api/products
 Content-Type: application/json
 
 {
-    "name":"14th Product"
+    "name" : "14th Product"
+}
+
+### Update product
+PUT {{baseUrl}}/api/products/1
+Content-Type: application/json
+
+{
+    "name" : "Updated Product Name"
+}
+
+### Update product - not found
+PUT {{baseUrl}}/api/products/99999
+Content-Type: application/json
+
+{
+    "name" : "nope"
 }
