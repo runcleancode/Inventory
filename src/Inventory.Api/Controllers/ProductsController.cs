@@ -1,6 +1,5 @@
 using Inventory.Application.DTOs;
 using Inventory.Application.Interfaces;
-using Inventory.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.Api.Controllers;
@@ -51,6 +50,21 @@ public sealed class ProductsController(IProductService productService) : Control
         }
 
         return Ok(updated);
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
+    {
+        bool deleted = await productService.DeleteAsync(id, cancellationToken);
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
     }
 }
 

@@ -31,3 +31,14 @@ Content-Type: application/json
 {
     "name" : "nope"
 }
+
+### Delete product
+DELETE {{baseUrl}}/api/products/1
+
+### Delete product - not found
+DELETE {{baseUrl}}/api/products/99999
+
+### Verify product is deleted
+GET {{baseUrl}}/api/products/1
+
+
