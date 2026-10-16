@@ -14,6 +14,11 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
         return product;
     }
 
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        return await context.Products.CountAsync(cancellationToken);
+    }
+
     public async Task DeleteAsync(Product product, CancellationToken cancellationToken = default)
     {
         context.Products.Remove(product);
@@ -26,6 +31,17 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
             .AsNoTracking()
             .FirstOrDefaultAsync(product => product.Id == id, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Product>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        return await context.Products
+            .AsNoTracking()
+            .OrderBy(product => product.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
 
     public async Task UpdateAsync(Product product, CancellationToken cancellationToken = default)
     {
