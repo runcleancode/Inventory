@@ -1,12 +1,15 @@
 @baseUrl=http://localhost:5000
 
+
 ### Get product by id (existing)
+GET {{baseUrl}}/api/products/2
+Accept: application/json
+
+
+### Get product by id (not found)
 GET {{baseUrl}}/api/products/1
 Accept: application/json
 
-### Get product by id (not found)
-GET {{baseUrl}}/api/products/0
-Accept: application/json
 
 ### Create product
 POST {{baseUrl}}/api/products
@@ -16,6 +19,7 @@ Content-Type: application/json
     "name" : "14th Product"
 }
 
+
 ### Update product
 PUT {{baseUrl}}/api/products/1
 Content-Type: application/json
@@ -23,6 +27,7 @@ Content-Type: application/json
 {
     "name" : "Updated Product Name"
 }
+
 
 ### Update product - not found
 PUT {{baseUrl}}/api/products/99999
@@ -32,13 +37,38 @@ Content-Type: application/json
     "name" : "nope"
 }
 
+
 ### Delete product
 DELETE {{baseUrl}}/api/products/1
+
 
 ### Delete product - not found
 DELETE {{baseUrl}}/api/products/99999
 
+
 ### Verify product is deleted
 GET {{baseUrl}}/api/products/1
+
+
+### Get all products (default page)
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+
+### Get all products (page 2, size 5)
+GET {{baseUrl}}/api/products?page=2&pageSize=5
+Accept: application/json
+
+
+### Get all products (pageSite exceeds max, clamped to 100)
+GET {{baseUrl}}/api/products?page=1&pageSize=99999
+Accept: application/json
+
+
+### Get all products (invalid page, clampted to 1)
+GET {{baseUrl}}/api/products?page=-5&pageSize=10
+Accept: application/json
+
+
 
 
