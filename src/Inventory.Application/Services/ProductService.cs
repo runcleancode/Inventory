@@ -1,5 +1,6 @@
 using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
+using Inventory.Application.Extensions;
 using Inventory.Application.Interfaces;
 using Inventory.Domain.Entities;
 
@@ -22,7 +23,7 @@ public sealed class ProductService : IProductService
 
         Product created = await _productRepository.AddAsync(product, cancellationToken);
 
-        return MapToDto(created);
+        return created.ToDto();
     }
 
     public async Task<ProductDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -34,7 +35,7 @@ public sealed class ProductService : IProductService
             return null;
         }
 
-        return MapToDto(product);
+        return product.ToDto();
     }
 
     public async Task<ProductDto?> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken = default)
@@ -50,7 +51,7 @@ public sealed class ProductService : IProductService
 
         await _productRepository.UpdateAsync(product, cancellationToken);
 
-        return MapToDto(product);
+        return product.ToDto();
     }
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -77,13 +78,8 @@ public sealed class ProductService : IProductService
 
         int totalCount = await _productRepository.CountAsync(cancellationToken);
 
-        IReadOnlyList<ProductDto> items = products.Select(MapToDto).ToList();
+        IReadOnlyList<ProductDto> items = products.Select(p => p.ToDto()).ToList();
 
         return new PagedResult<ProductDto>(items, normalizedPage, normalizedPageSize, totalCount);
-    }
-
-    private static ProductDto MapToDto(Product product)
-    {
-        return new ProductDto(product.Id, product.Name);
     }
 }
