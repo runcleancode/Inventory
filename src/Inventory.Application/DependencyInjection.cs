@@ -1,3 +1,4 @@
+using FluentValidation;
 using Inventory.Application.Interfaces;
 using Inventory.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,8 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<IProductService, ProductService>();
+
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
         return services;
     }

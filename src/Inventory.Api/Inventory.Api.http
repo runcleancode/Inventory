@@ -1,5 +1,6 @@
 @baseUrl=http://localhost:5000
 
+@tooLongProductName = ThisIsAnExtremelyLongProductNameDesignedToExceedTheMaximumAllowedLengthOfTwoHundredCharactersInsideTheFluentValidationRuleSetAndTriggerAValidationExceptionWithAStandardProblemDetailsResponsePayload12345
 
 ### Get product by id (existing)
 GET {{baseUrl}}/api/products/2
@@ -21,7 +22,7 @@ Content-Type: application/json
 
 
 ### Update product
-PUT {{baseUrl}}/api/products/1
+PUT {{baseUrl}}/api/products/2
 Content-Type: application/json
 
 {
@@ -68,6 +69,33 @@ Accept: application/json
 ### Get all products (invalid page, clampted to 1)
 GET {{baseUrl}}/api/products?page=-5&pageSize=10
 Accept: application/json
+
+
+### Create product - validation error (empty name)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+
+{
+    "name": ""
+}
+
+
+### Create prodduct - validation error (too long)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+
+{
+    "name": "{{tooLongProductName}}"
+}
+
+
+### Update product - validation error
+PUT {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{
+    "name": ""
+}
 
 
 
