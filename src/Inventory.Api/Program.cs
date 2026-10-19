@@ -1,3 +1,4 @@
+using Inventory.Api.ExceptionHandlers;
 using Inventory.Api.Filters;
 using Inventory.Application;
 using Inventory.Infrastructure;
@@ -16,6 +17,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
+// Problem Details (RFC 7807)
+builder.Services.AddProblemDetails();
+
+// Exception handling
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 // Application (services, DTOs, interfaces)
 builder.Services.AddApplication();
 
@@ -25,10 +32,12 @@ builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 // --- Middleware pipeline ---
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     // Swagger/OpenAPI will be added later as a schema-only endpoint.
-    app.UseDeveloperExceptionPage();
+    // app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

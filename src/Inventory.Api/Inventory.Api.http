@@ -98,5 +98,14 @@ Content-Type: application/json
 }
 
 
+### Get product - not found (should be 404 with ProblemDetails)
+GET {{baseUrl}}/api/products/999999
+Accept: application/json
+
+
+### Delete product - not found (should be 404 with ProblemDetails)
+DELETE {{baseUrl}}/api/products/999999
+
+
 
 

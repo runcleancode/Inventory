@@ -1,3 +1,4 @@
+using Inventory.Application.Common.Exceptions;
 using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
 using Inventory.Application.Extensions;
@@ -26,25 +27,25 @@ public sealed class ProductService : IProductService
         return created.ToDto();
     }
 
-    public async Task<ProductDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ProductDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
 
         if (product is null)
         {
-            return null;
+            throw new NotFoundException(nameof(Product), id);
         }
 
         return product.ToDto();
     }
 
-    public async Task<ProductDto?> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken = default)
+    public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken = default)
     {
         Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
 
         if (product is null)
         {
-            return null;
+            throw new NotFoundException(nameof(Product), id);
         }
 
         product.SetName(dto.Name);
@@ -54,18 +55,16 @@ public sealed class ProductService : IProductService
         return product.ToDto();
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
 
         if (product is null)
         {
-            return false;
+            throw new NotFoundException(nameof(Product), id);
         }
 
         await _productRepository.DeleteAsync(product, cancellationToken);
-
-        return true;
     }
 
     public async Task<PagedResult<ProductDto>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)

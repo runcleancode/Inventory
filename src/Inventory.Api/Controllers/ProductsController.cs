@@ -14,12 +14,7 @@ public sealed class ProductsController(IProductService productService) : Control
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDto>> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        ProductDto? product = await productService.GetByIdAsync(id, cancellationToken);
-
-        if (product is null)
-        {
-            return NotFound();
-        }
+        ProductDto product = await productService.GetByIdAsync(id, cancellationToken);
 
         return Ok(product);
     }
@@ -43,12 +38,7 @@ public sealed class ProductsController(IProductService productService) : Control
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDto>> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken)
     {
-        ProductDto? updated = await productService.UpdateAsync(id, dto, cancellationToken);
-
-        if (updated is null)
-        {
-            return NotFound();
-        }
+        ProductDto updated = await productService.UpdateAsync(id, dto, cancellationToken);
 
         return Ok(updated);
     }
@@ -58,12 +48,7 @@ public sealed class ProductsController(IProductService productService) : Control
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        bool deleted = await productService.DeleteAsync(id, cancellationToken);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
+        await productService.DeleteAsync(id, cancellationToken);
 
         return NoContent();
     }
