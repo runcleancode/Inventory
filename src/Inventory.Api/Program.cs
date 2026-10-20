@@ -3,8 +3,23 @@ using Inventory.Api.Filters;
 using Inventory.Application;
 using Inventory.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using Serilog.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ---Serilog---
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+        .Enrich.WithEnvironmentName()
+        .WriteTo.Console(
+            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+        .WriteTo.Seq(context.Configuration["Serilog:SeqUrl"]!);
+});
 
 // --- Services ---
 builder.Services.AddControllers(options =>
@@ -32,6 +47,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 // --- Middleware pipeline ---
+app.UseSerilogRequestLogging();
+
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
