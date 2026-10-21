@@ -1,111 +1,82 @@
-@baseUrl=http://localhost:5000
+@baseUrl = http://localhost:5000
 
-@tooLongProductName = ThisIsAnExtremelyLongProductNameDesignedToExceedTheMaximumAllowedLengthOfTwoHundredCharactersInsideTheFluentValidationRuleSetAndTriggerAValidationExceptionWithAStandardProblemDetailsResponsePayload12345
+### Get all products (default page)
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+### Get all products (page 2, size 5)
+GET {{baseUrl}}/api/products?page=2&pageSize=5
+Accept: application/json
+
+### Get all products (pageSize exceeds max, clamped to 100)
+GET {{baseUrl}}/api/products?page=1&pageSize=99999
+Accept: application/json
+
+### Get all products (invalid page, clamped to 1)
+GET {{baseUrl}}/api/products?page=-5&pageSize=10
+Accept: application/json
 
 ### Get product by id (existing)
 GET {{baseUrl}}/api/products/2
 Accept: application/json
 
-
 ### Get product by id (not found)
-GET {{baseUrl}}/api/products/1
+GET {{baseUrl}}/api/products/99999
 Accept: application/json
-
 
 ### Create product
 POST {{baseUrl}}/api/products
 Content-Type: application/json
 
 {
-    "name" : "15th Product"
+  "name": "New Product Test"
 }
-
-
-### Update product
-PUT {{baseUrl}}/api/products/15
-Content-Type: application/json
-
-{
-    "name" : "With id: 15 Updated Product Name"
-}
-
-
-### Update product - not found
-PUT {{baseUrl}}/api/products/99999
-Content-Type: application/json
-
-{
-    "name" : "nope"
-}
-
-
-### Delete product
-DELETE {{baseUrl}}/api/products/1
-
-
-### Delete product - not found
-DELETE {{baseUrl}}/api/products/99999
-
-
-### Verify product is deleted
-GET {{baseUrl}}/api/products/1
-
-
-### Get all products (default page)
-GET {{baseUrl}}/api/products
-Accept: application/json
-
-
-### Get all products (page 2, size 5)
-GET {{baseUrl}}/api/products?page=2&pageSize=5
-Accept: application/json
-
-
-### Get all products (pageSite exceeds max, clamped to 100)
-GET {{baseUrl}}/api/products?page=1&pageSize=99999
-Accept: application/json
-
-
-### Get all products (invalid page, clampted to 1)
-GET {{baseUrl}}/api/products?page=-5&pageSize=10
-Accept: application/json
-
 
 ### Create product - validation error (empty name)
 POST {{baseUrl}}/api/products
 Content-Type: application/json
 
 {
-    "name": ""
+  "name": ""
 }
 
-
-### Create prodduct - validation error (too long)
+### Create product - validation error (too long)
 POST {{baseUrl}}/api/products
 Content-Type: application/json
 
 {
-    "name": "{{tooLongProductName}}"
+  "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 }
 
-
-### Update product - validation error
-PUT {{baseUrl}}/api/products/2
+### Update product
+PUT {{baseUrl}}/api/products/16
 Content-Type: application/json
 
 {
-    "name": ""
+  "name": "Updated"
 }
 
+### Update product - not found
+PUT {{baseUrl}}/api/products/99999
+Content-Type: application/json
 
-### Get product - not found (should be 404 with ProblemDetails)
-GET {{baseUrl}}/api/products/999999
-Accept: application/json
+{
+  "name": "Nope"
+}
 
+### Update product - validation error
+PUT {{baseUrl}}/api/products/1
+Content-Type: application/json
 
-### Delete product - not found (should be 404 with ProblemDetails)
-DELETE {{baseUrl}}/api/products/999999
+{
+  "name": ""
+}
 
+### Delete product
+DELETE {{baseUrl}}/api/products/16
 
+### Delete product - not found
+DELETE {{baseUrl}}/api/products/99999
 
-
+### Verify product is deleted
+GET {{baseUrl}}/api/products/1

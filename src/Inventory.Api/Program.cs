@@ -4,7 +4,6 @@ using Inventory.Application;
 using Inventory.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Serilog.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
