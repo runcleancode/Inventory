@@ -4,6 +4,8 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 ![Serilog](https://img.shields.io/badge/Serilog-2.12-1E90FF?logo=nuget&logoColor=white)
+![Seq](https://img.shields.io/badge/Seq-2024-4B0082?logo=seq&logoColor=white)
+![Adminer](https://img.shields.io/badge/Adminer-latest-5A5A5A)
 
 A Restful Web API built with ASP.NET Core (.NET 10) following Clean Architecture principles.
 
@@ -40,6 +42,21 @@ Dependency direction: `Api → Application → Domain`, `Infrastructure → Appl
 docker compose up -d
 dotnet run --project src/Inventory.Api
 ```
+
+### Services
+
+When you run `docker compose up -d`, the following services are started:
+
+| Service | Port | Purpose |
+|---|---|---|
+| PostgreSQL 17 | 5432 | Main database |
+| Adminer | 8080 | Web-based database management UI |
+| Seq | 5341 | Structured log viewer |
+
+**Access:**
+- API: `http://localhost:5000`
+- Adminer: `http://localhost:8080` (server: `postgres`, user: `inventory_user`, password: `inventory_pass`, database: `inventory_db`)
+- Seq: `http://localhost:5341`
 
 ## Project Status
 
