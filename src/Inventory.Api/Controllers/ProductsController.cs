@@ -1,6 +1,7 @@
 using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
 using Inventory.Application.Interfaces;
+using Inventory.Application.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.Api.Controllers;
@@ -56,15 +57,12 @@ public sealed class ProductsController(IProductService productService) : Control
     [HttpGet(Name = "GetProducts")]
     [ProducesResponseType<PagedResult<ProductDto>>(StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<ProductDto>>> GetAllAsync(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10,
+       [FromQuery] ProductQueryParams queryParams,
         CancellationToken cancellationToken = default)
     {
-        PagedResult<ProductDto> result = await productService.GetPagedAsync(page, pageSize, cancellationToken);
+        PagedResult<ProductDto> result = await productService.GetPagedAsync(queryParams, cancellationToken);
 
         return Ok(result);
     }
-
-
 }
 
