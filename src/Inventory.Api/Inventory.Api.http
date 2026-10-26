@@ -29,7 +29,7 @@ POST {{baseUrl}}/api/products
 Content-Type: application/json
 
 {
-  "name": "New Product Test"
+  "name": "Create me"
 }
 
 ### Create product - validation error (empty name)
@@ -80,3 +80,23 @@ DELETE {{baseUrl}}/api/products/99999
 
 ### Verify product is deleted
 GET {{baseUrl}}/api/products/1
+
+### Get all products (no filter)
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+### Filter by id
+GET {{baseUrl}}/api/products?id=2
+Accept: application/json
+
+### Filter by name (contains, case-insensitive)
+GET {{baseUrl}}/api/products?name=KaLem
+Accept: application/json
+
+### Filter by name + pagination
+GET {{baseUrl}}/api/products?name=kalem&page=1&pageSize=5
+Accept: application/json
+
+### Filter that matches nothing
+GET {{baseUrl}}/api/products?name=nothing
+Accept: application/json

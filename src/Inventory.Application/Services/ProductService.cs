@@ -3,6 +3,7 @@ using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
 using Inventory.Application.Extensions;
 using Inventory.Application.Interfaces;
+using Inventory.Application.Queries;
 using Inventory.Domain.Entities;
 
 namespace Inventory.Application.Services;
@@ -67,15 +68,20 @@ public sealed class ProductService : IProductService
         await _productRepository.DeleteAsync(product, cancellationToken);
     }
 
-    public async Task<PagedResult<ProductDto>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<ProductDto>> GetPagedAsync(ProductQueryParams queryParams, CancellationToken cancellationToken = default)
     {
-        int normalizedPage = page < 1 ? 1 : page;
-        int normalizedPageSize = Math.Clamp(pageSize, 1, MaxPageSize);
+        int normalizedPage = queryParams.Page < 1 ? 1 : queryParams.Page;
+        int normalizedPageSize = Math.Clamp(queryParams.PageSize, 1, MaxPageSize);
 
-        IReadOnlyList<Product> products = await _productRepository.GetPagedAsync(
-            normalizedPage, normalizedPageSize, cancellationToken);
+        ProductQueryParams normalizedQueryParams = queryParams with
+        {
+            Page = normalizedPage,
+            PageSize = normalizedPageSize,
+        };
 
-        int totalCount = await _productRepository.CountAsync(cancellationToken);
+        IReadOnlyList<Product> products = await _productRepository.GetPagedAsync(normalizedQueryParams, cancellationToken);
+
+        int totalCount = await _productRepository.CountAsync(normalizedQueryParams, cancellationToken);
 
         IReadOnlyList<ProductDto> items = products.Select(p => p.ToDto()).ToList();
 

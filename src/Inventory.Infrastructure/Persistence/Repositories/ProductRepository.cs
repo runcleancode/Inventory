@@ -1,4 +1,5 @@
 using Inventory.Application.Interfaces;
+using Inventory.Application.Queries;
 using Inventory.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,9 +15,10 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
         return product;
     }
 
-    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    public async Task<int> CountAsync(ProductQueryParams queryParams, CancellationToken cancellationToken = default)
     {
-        return await context.Products.CountAsync(cancellationToken);
+        return await ApplyFilters(context.Products.AsNoTracking(), queryParams)
+            .CountAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(Product product, CancellationToken cancellationToken = default)
@@ -32,13 +34,12 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
             .FirstOrDefaultAsync(product => product.Id == id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Product>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Product>> GetPagedAsync(ProductQueryParams queryParams, CancellationToken cancellationToken = default)
     {
-        return await context.Products
-            .AsNoTracking()
+        return await ApplyFilters(context.Products.AsNoTracking(), queryParams)
             .OrderBy(product => product.Id)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
+            .Skip((queryParams.Page - 1) * queryParams.PageSize)
+            .Take(queryParams.PageSize)
             .ToListAsync(cancellationToken);
     }
 
@@ -47,5 +48,20 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
     {
         context.Products.Update(product);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static IQueryable<Product> ApplyFilters(IQueryable<Product> query, ProductQueryParams queryParams)
+    {
+        if (queryParams.Id.HasValue)
+        {
+            query = query.Where(product => product.Id == queryParams.Id.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(queryParams.Name))
+        {
+            query = query.Where(product => EF.Functions.ILike(product.Name, $"%{queryParams.Name}%"));
+        }
+
+        return query;
     }
 }
