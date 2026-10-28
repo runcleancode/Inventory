@@ -1,3 +1,4 @@
+using Inventory.Application.Common.Enums;
 using Inventory.Application.Interfaces;
 using Inventory.Application.Queries;
 using Inventory.Domain.Entities;
@@ -36,8 +37,7 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
 
     public async Task<IReadOnlyList<Product>> GetPagedAsync(ProductQueryParams queryParams, CancellationToken cancellationToken = default)
     {
-        return await ApplyFilters(context.Products.AsNoTracking(), queryParams)
-            .OrderBy(product => product.Id)
+        return await ApplySorting(ApplyFilters(context.Products.AsNoTracking(), queryParams), queryParams)
             .Skip((queryParams.Page - 1) * queryParams.PageSize)
             .Take(queryParams.PageSize)
             .ToListAsync(cancellationToken);
@@ -63,5 +63,25 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
         }
 
         return query;
+    }
+
+    private static IQueryable<Product> ApplySorting(IQueryable<Product> query, ProductQueryParams queryParams)
+    {
+        bool descending = queryParams.SortDir == SortDirection.Desc;
+
+        return queryParams.SortBy?.ToLowerInvariant() switch
+        {
+            "id" => descending
+                ? query.OrderByDescending(product => product.Id)
+                : query.OrderBy(product => product.Id),
+
+            "name" => descending
+                ? query.OrderByDescending(product => product.Name)
+                : query.OrderBy(product => product.Name),
+
+            _ => descending
+                ? query.OrderByDescending(product => product.Id)
+                : query.OrderBy(product => product.Id),
+        };
     }
 }
