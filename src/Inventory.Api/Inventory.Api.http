@@ -128,3 +128,23 @@ Accept: application/json
 ### Invalid sortDir (should be 400)
 GET {{baseUrl}}/api/products?sortBy=name&sortDir=invalid
 Accept: application/json
+
+### Search by keyword (q)
+GET {{baseUrl}}/api/products?q=kalem
+Accept: application/json
+
+### Search + sort + pagination
+GET {{baseUrl}}/api/products?q=kalem&sortBy=name&sortDir=asc&page=1&pageSize=5
+Accept: application/json
+
+### Search + name filter combined (both must match)
+GET {{baseUrl}}/api/products?q=kalem&name=kirmizi
+Accept: application/json
+
+### Search that matches nothing
+GET {{baseUrl}}/api/products?q=zzzzzzzzzz
+Accept: application/json
+
+### Search is case - insensitive
+GET {{baseUrl}}/api/products?q=KALEM
+Accept: application/json

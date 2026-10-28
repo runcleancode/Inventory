@@ -62,6 +62,14 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
             query = query.Where(product => EF.Functions.ILike(product.Name, $"%{queryParams.Name}%"));
         }
 
+        if (!string.IsNullOrWhiteSpace(queryParams.Q))
+        {
+            query = query.Where(product =>
+                EF.Functions.ILike(product.Name, $"%{queryParams.Q}%"));
+            // Phase 4: OR description ILIKE '%q%'
+            // Phase 4: OR category.name ILIKE '%q%'
+        }
+
         return query;
     }
 
