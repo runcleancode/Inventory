@@ -100,3 +100,31 @@ Accept: application/json
 ### Filter that matches nothing
 GET {{baseUrl}}/api/products?name=nothing
 Accept: application/json
+
+### Sort by id ascending (default)
+GET {{baseUrl}}/api/products?sortBy=id&sortDir=asc
+Accept: application/json
+
+### Sort by id descending
+GET {{baseUrl}}/api/products?sortBy=id&sortDir=desc
+Accept: application/json
+
+### Sort by name ascending
+GET {{baseUrl}}/api/products?sortBy=name&sortDir=asc
+Accept: application/json
+
+### Sort by name descending
+GET {{baseUrl}}/api/products?sortBy=name&sortDir=desc
+Accept: application/json
+
+### Sort by name descending with filter and pagination
+GET {{baseUrl}}/api/products?name=kalem&sortBy=name&sortDir=desc&page=1&pageSize=5
+Accept: application/json
+
+### Invalid sortBy (falls back to id)
+GET {{baseUrl}}/api/products?sortBy=password&sortDir=asc
+Accept: application/json
+
+### Invalid sortDir (should be 400)
+GET {{baseUrl}}/api/products?sortBy=name&sortDir=invalid
+Accept: application/json
