@@ -10,8 +10,6 @@ namespace Inventory.Application.Services;
 
 public sealed class ProductService : IProductService
 {
-    private const int MaxPageSize = 100;
-
     private readonly IProductRepository _productRepository;
 
     public ProductService(IProductRepository productRepository)
@@ -70,21 +68,12 @@ public sealed class ProductService : IProductService
 
     public async Task<PagedResult<ProductDto>> GetPagedAsync(ProductQueryParams queryParams, CancellationToken cancellationToken = default)
     {
-        int normalizedPage = queryParams.Page < 1 ? 1 : queryParams.Page;
-        int normalizedPageSize = Math.Clamp(queryParams.PageSize, 1, MaxPageSize);
+        IReadOnlyList<Product> products = await _productRepository.GetPagedAsync(queryParams, cancellationToken);
 
-        ProductQueryParams normalizedQueryParams = queryParams with
-        {
-            Page = normalizedPage,
-            PageSize = normalizedPageSize,
-        };
-
-        IReadOnlyList<Product> products = await _productRepository.GetPagedAsync(normalizedQueryParams, cancellationToken);
-
-        int totalCount = await _productRepository.CountAsync(normalizedQueryParams, cancellationToken);
+        int totalCount = await _productRepository.CountAsync(queryParams, cancellationToken);
 
         IReadOnlyList<ProductDto> items = products.Select(p => p.ToDto()).ToList();
 
-        return new PagedResult<ProductDto>(items, normalizedPage, normalizedPageSize, totalCount);
+        return new PagedResult<ProductDto>(items, queryParams.Page, queryParams.PageSize, totalCount);
     }
 }
