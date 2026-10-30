@@ -13,25 +13,26 @@ internal sealed class GlobalExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (exception is AppException appException)
+        bool isAppException = exception is AppException;
+
+        if (isAppException)
         {
             logger.LogWarning(
-                appException,
+                exception,
                 "Application exception: {ExceptionType} TraceId: {TraceId}",
-                appException.GetType().Name,
+                exception.GetType().Name,
                 httpContext.TraceIdentifier);
         }
         else
         {
-            logger.LogError(
-                exception,
-                "Unhandled exception occurred. TraceId: {TraceId}",
-                httpContext.TraceIdentifier);
+            logger.LogError(exception,
+            "Unhandled exception occured. TraceId: {TraceId}",
+            httpContext.TraceIdentifier);
         }
 
         int statusCode = exception switch
         {
-            NotFoundException => StatusCodes.Status404NotFound,
+            AppException appException => appException.StatusCode,
             _ => StatusCodes.Status500InternalServerError,
         };
 
@@ -40,12 +41,15 @@ internal sealed class GlobalExceptionHandler(
         ProblemDetails problemDetails = new()
         {
             Status = statusCode,
-            Title = statusCode == StatusCodes.Status404NotFound
-                ? "Resource not found"
-                : "An unexpected error occurred",
-            Detail = statusCode == StatusCodes.Status404NotFound
+            Title = statusCode switch
+            {
+                StatusCodes.Status404NotFound => "Resource not found",
+                StatusCodes.Status400BadRequest => "Bad request",
+                _ => "An unexpected error occured",
+            },
+            Detail = isAppException
                 ? exception.Message
-                : "An internal server error occurred. Please contact support with the trace id.",
+                : "An internal server error occured. Please contact support with the trace id.",
             Instance = httpContext.Request.Path,
             Extensions =
             {

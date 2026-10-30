@@ -181,4 +181,51 @@ Accept:  application/json
 GET {{baseUrl}}/api/products?sortBy=
 Accept: application/json
 
+### Patch: update name only (should be 200)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+    "name" : "Second New Value = Kursun Kalem"
+}
+
+### Patch: empty body (should be 200, no change)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{}
+
+### Patch: null name (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+    "name" : null
+}
+
+### Patch: unknown field (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+    "price" : 10
+}
+
+### Patch: wrong content type (should be 415)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{
+    "name" : "Test"
+}
+
+### Patch: body is array (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+[]
+
+
+
+
 
