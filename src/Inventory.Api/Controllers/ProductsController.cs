@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
 using Inventory.Application.Interfaces;
@@ -63,6 +64,18 @@ public sealed class ProductsController(IProductService productService) : Control
         PagedResult<ProductDto> result = await productService.GetPagedAsync(queryParams, cancellationToken);
 
         return Ok(result);
+    }
+
+    [HttpPatch("{id:int}")]
+    [Consumes("application/merge-patch+json")]
+    public async Task<ActionResult<ProductDto>> PatchAsync(
+        int id,
+        [FromBody] JsonElement patchDocument,
+        CancellationToken cancellationToken)
+    {
+        ProductDto updated = await productService.PatchAsync(id, patchDocument, cancellationToken);
+
+        return Ok(updated);
     }
 }
 

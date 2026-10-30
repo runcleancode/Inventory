@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Inventory.Application.Common.Exceptions;
 using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
@@ -75,5 +76,44 @@ public sealed class ProductService : IProductService
         IReadOnlyList<ProductDto> items = products.Select(p => p.ToDto()).ToList();
 
         return new PagedResult<ProductDto>(items, queryParams.Page, queryParams.PageSize, totalCount);
+    }
+
+    public async Task<ProductDto> PatchAsync(int id, JsonElement patchDocument, CancellationToken cancellationToken = default)
+    {
+        Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
+
+        if (product is null)
+        {
+            throw new NotFoundException(nameof(Product), id);
+        }
+
+        if (patchDocument.ValueKind != JsonValueKind.Object)
+        {
+            throw new BadRequestException("Patch body must be a JSON object.");
+        }
+
+        foreach (JsonProperty property in patchDocument.EnumerateObject())
+        {
+            if (!string.Equals(property.Name, "name", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BadRequestException($"Unknown field in patch document: '{property.Name}'.");
+            }
+
+            if (property.Value.ValueKind == JsonValueKind.Null)
+            {
+                throw new BadRequestException("Field 'name' cannot be null.");
+            }
+
+            if (property.Value.ValueKind != JsonValueKind.String)
+            {
+                throw new BadRequestException("Field 'name' must be a string.");
+            }
+
+            product.SetName(property.Value.GetString()!);
+        }
+
+        await _productRepository.UpdateAsync(product, cancellationToken);
+
+        return product.ToDto();
     }
 }

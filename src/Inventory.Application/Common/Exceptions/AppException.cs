@@ -2,7 +2,14 @@ namespace Inventory.Application.Common.Exceptions;
 
 public abstract class AppException : Exception
 {
-    protected AppException(string message) : base(message) { }
+    public int StatusCode { get; }
+    protected AppException(string message, int statusCode = 500) : base(message)
+    {
+        StatusCode = statusCode;
+    }
 
-    protected AppException(string message, Exception innerException) : base(message, innerException) { }
+    protected AppException(string message, Exception innerException, int statusCode = 500) : base(message, innerException)
+    {
+        StatusCode = statusCode;
+    }
 }
