@@ -148,3 +148,37 @@ Accept: application/json
 ### Search is case - insensitive
 GET {{baseUrl}}/api/products?q=KALEM
 Accept: application/json
+
+### Invalid sortBy (should be 400)
+GET {{baseUrl}}/api/products?sortBy=password
+Accept: application/json
+
+### Invalid page (should be 400)
+GET {{baseUrl}}/api/products?page=0
+Accept: application/json
+
+### Invalid page size (too large, should be 400)
+GET {{baseUrl}}/api/products?pageSize=99999
+Accept: application/json
+
+### Invalid page size (zero, should be 400)
+GET {{baseUrl}}/api/products?pageSize=0
+Accept: application/json
+
+### Invalid id (negative, should be 400)
+GET {{baseUrl}}/api/products?id=-5
+Accept: application/json
+
+### Search term too long (should be 400)
+GET {{baseUrl}}/api/products?q=abcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyz
+Accept: application/json
+
+### Valid query (should be 200)
+GET {{baseUrl}}/api/products?sortBy=name&sortDir=desc&page=1&pageSize=10&q=kalem
+Accept:  application/json
+
+### Empty sortBy (should be 200, defaults to id)
+GET {{baseUrl}}/api/products?sortBy=
+Accept: application/json
+
+

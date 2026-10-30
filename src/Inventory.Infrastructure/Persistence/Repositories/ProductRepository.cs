@@ -79,11 +79,11 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
 
         return queryParams.SortBy?.ToLowerInvariant() switch
         {
-            "id" => descending
+            ProductSortFields.Id => descending
                 ? query.OrderByDescending(product => product.Id)
                 : query.OrderBy(product => product.Id),
 
-            "name" => descending
+            ProductSortFields.Name => descending
                 ? query.OrderByDescending(product => product.Name)
                 : query.OrderBy(product => product.Name),
 
