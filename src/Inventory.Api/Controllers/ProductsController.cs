@@ -12,8 +12,10 @@ namespace Inventory.Api.Controllers;
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet("{id:int}", Name = "GetProductById")]
+    [Produces("application/json", "application/xml")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<ActionResult<ProductDto>> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         ProductDto product = await productService.GetByIdAsync(id, cancellationToken);
@@ -22,8 +24,10 @@ public sealed class ProductsController(IProductService productService) : Control
     }
 
     [HttpPost]
+    [Consumes("application/json")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
     public async Task<ActionResult<ProductDto>> CreateAsync(CreateProductDto dto, CancellationToken cancellationToken)
     {
         ProductDto created = await productService.CreateAsync(dto, cancellationToken);
@@ -35,9 +39,11 @@ public sealed class ProductsController(IProductService productService) : Control
     }
 
     [HttpPut("{id:int}")]
+    [Consumes("application/json")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
     public async Task<ActionResult<ProductDto>> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken)
     {
         ProductDto updated = await productService.UpdateAsync(id, dto, cancellationToken);
@@ -56,7 +62,9 @@ public sealed class ProductsController(IProductService productService) : Control
     }
 
     [HttpGet(Name = "GetProducts")]
+    [Produces("application/json", "application/xml")]
     [ProducesResponseType<PagedResult<ProductDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<ActionResult<PagedResult<ProductDto>>> GetAllAsync(
        [FromQuery] ProductQueryParams queryParams,
         CancellationToken cancellationToken = default)
@@ -68,6 +76,9 @@ public sealed class ProductsController(IProductService productService) : Control
 
     [HttpPatch("{id:int}")]
     [Consumes("application/merge-patch+json")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
     public async Task<ActionResult<ProductDto>> PatchAsync(
         int id,
         [FromBody] JsonElement patchDocument,
