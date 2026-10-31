@@ -24,7 +24,10 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
-});
+    options.RespectBrowserAcceptHeader = true;
+    options.ReturnHttpNotAcceptable = true;
+})
+.AddXmlSerializerFormatters();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

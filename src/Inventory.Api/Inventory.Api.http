@@ -225,6 +225,42 @@ Content-Type: application/merge-patch+json
 
 []
 
+### Get by id as JSON
+GET {{baseUrl}}/api/products/2
+Accept: application/json
+
+### Get by id as XML (should be XML)
+GET {{baseUrl}}/api/products/2
+Accept: application/xml
+
+#### Get paged as XML (should be XML)
+GET {{baseUrl}}/api/products?page=1&pageSize=5
+Accept: application/xml
+
+### Unspported Accept header (should be 406)
+GET {{baseUrl}}/api/products/2
+Accept: application/pdf
+
+### Post with XML body (should be 415)
+POST  {{baseUrl}}/api/products
+Content-Type: application/xml
+
+<ProductDto><Name>Test</Name></ProductDto>
+
+### Post with JSON body (should be 201)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+
+{
+    "name" : "26rd Product"
+}
+
+### No accept header → defaults to JSON (should be JSON)
+GET {{baseUrl}}/api/products/2
+
+
+
+
 
 
 
