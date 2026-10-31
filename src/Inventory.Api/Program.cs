@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Inventory.Api.ExceptionHandlers;
 using Inventory.Api.Filters;
 using Inventory.Application;
@@ -19,6 +20,23 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
             outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
         .WriteTo.Seq(context.Configuration["Serilog:SeqUrl"]!);
 });
+
+// --- API Versioning ---
+builder.Services
+    .AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1.0);
+        options.AssumeDefaultVersionWhenUnspecified = false;
+        options.ReportApiVersions = true;
+        options.ApiVersionReader = new UrlSegmentApiVersionReader();
+        options.UnsupportedApiVersionStatusCode = StatusCodes.Status400BadRequest;
+    })
+    .AddMvc()
+    .AddApiExplorer(options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
 
 // --- Services ---
 builder.Services.AddControllers(options =>

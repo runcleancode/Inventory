@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Asp.Versioning;
 using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
 using Inventory.Application.Interfaces;
@@ -7,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/products")]
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet("{id:int}", Name = "GetProductById")]
@@ -34,7 +36,7 @@ public sealed class ProductsController(IProductService productService) : Control
 
         return CreatedAtRoute(
             routeName: "GetProductById",
-            routeValues: new { id = created.Id },
+            routeValues: new { version = "1.0", id = created.Id },
             value: created);
     }
 
@@ -66,7 +68,7 @@ public sealed class ProductsController(IProductService productService) : Control
     [ProducesResponseType<PagedResult<ProductDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<ActionResult<PagedResult<ProductDto>>> GetAllAsync(
-       [FromQuery] ProductQueryParams queryParams,
+        [FromQuery] ProductQueryParams queryParams,
         CancellationToken cancellationToken = default)
     {
         PagedResult<ProductDto> result = await productService.GetPagedAsync(queryParams, cancellationToken);
@@ -89,4 +91,3 @@ public sealed class ProductsController(IProductService productService) : Control
         return Ok(updated);
     }
 }
-

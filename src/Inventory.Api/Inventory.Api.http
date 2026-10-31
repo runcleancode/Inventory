@@ -258,7 +258,56 @@ Content-Type: application/json
 ### No accept header → defaults to JSON (should be JSON)
 GET {{baseUrl}}/api/products/2
 
+### --- VERSIONING ---
 
+### GET v1 by id (should be 200 JSON)
+GET {{baseUrl}}/api/v1/products/2
+Accept: application/json
+
+### GET v1 by id as XML (should be 200 XML)
+GET {{baseUrl}}/api/v1/products/2
+Accept: application/xml
+
+### GET v1 paged (should be 200 JSON)
+GET {{baseUrl}}/api/v1/products?page=1&pageSize=5
+Accept: application/json
+
+### GET v1 paged as XML (should be 200 XML)
+GET {{baseUrl}}/api/v1/products?page=1&pageSize=5
+Accept: application/xml
+
+### GET without version (should be 404)
+GET {{baseUrl}}/api/products/2
+
+### GET unsupported version (should be 404)
+GET {{baseUrl}}/api/v2/products/2
+
+### POST v1 (should be 201, Location: /api/v1/products/{id})
+POST {{baseUrl}}/api/v1/products
+Content-Type: application/json
+
+{
+  "name": "Test Product"
+}
+
+### PUT v1 (should be 200)
+PUT {{baseUrl}}/api/v1/products/2
+Content-Type: application/json
+
+{
+  "name": "Updated Product"
+}
+
+### PATCH v1 (should be 200)
+PATCH {{baseUrl}}/api/v1/products/25
+Content-Type: application/merge-patch+json
+
+{
+  "name": "Patched Product"
+}
+
+### DELETE v1 (should be 204)
+DELETE {{baseUrl}}/api/v1/products/25
 
 
 
