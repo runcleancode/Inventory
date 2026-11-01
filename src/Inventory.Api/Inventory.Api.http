@@ -181,4 +181,67 @@ Accept:  application/json
 GET {{baseUrl}}/api/products?sortBy=
 Accept: application/json
 
+### Patch - update name (should be 200)
+PATCH  {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+    "name" : "Patched via merge patch"
+}
+
+### Patch - empty body, no-op (should be 200, name unchanged)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{}
+
+### Patch - set name to null (should be 400, required field)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+    "name" : null
+}
+
+### Patch - empty string (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+    "name" : ""
+}
+
+### Patch - whitespace only (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+    "name" : "    "
+}
+
+### Patch - too long (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/merge-patch+json
+
+{
+      "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
+
+### Patch - not found (should be 404)
+PATCH {{baseUrl}}/api/products/99999
+Content-Type: application/merge-patch+json
+
+{
+    "name" : "Nope"
+}
+
+### Patch - wrong content type (should be 415)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{
+    "name" : "test"
+}
+
+
 

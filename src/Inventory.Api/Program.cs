@@ -1,5 +1,6 @@
 using Inventory.Api.ExceptionHandlers;
 using Inventory.Api.Filters;
+using Inventory.Api.Formatters;
 using Inventory.Application;
 using Inventory.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,7 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
+    options.InputFormatters.Insert(0, new MergePatchInputFormatter());
 });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
