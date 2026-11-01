@@ -64,5 +64,21 @@ public sealed class ProductsController(IProductService productService) : Control
 
         return Ok(result);
     }
+
+    [HttpPatch("{id:int}")]
+    [Consumes("application/merge-patch+json")]
+    [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
+    public async Task<ActionResult<ProductDto>> PatchAsync(
+        int id,
+        [FromBody] ProductPatchDto dto,
+        CancellationToken cancellationToken)
+    {
+        ProductDto patched = await productService.PatchAsync(id, dto, cancellationToken);
+
+        return Ok(patched);
+    }
 }
 
