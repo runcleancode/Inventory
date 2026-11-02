@@ -8,27 +8,23 @@ using Inventory.Domain.Entities;
 
 namespace Inventory.Application.Services;
 
-public sealed class ProductService : IProductService
+public sealed class ProductService(
+    IProductRepository productRepository,
+    IUnitOfWork unitOfWork) : IProductService
 {
-    private readonly IProductRepository _productRepository;
-
-    public ProductService(IProductRepository productRepository)
-    {
-        _productRepository = productRepository;
-    }
-
     public async Task<ProductDto> CreateAsync(CreateProductDto dto, CancellationToken cancellationToken = default)
     {
         Product product = new(dto.Name);
 
-        Product created = await _productRepository.AddAsync(product, cancellationToken);
+        Product created = await productRepository.AddAsync(product, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return created.ToDto();
     }
 
     public async Task<ProductDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
+        Product? product = await productRepository.GetByIdAsync(id, cancellationToken);
 
         if (product is null)
         {
@@ -40,7 +36,7 @@ public sealed class ProductService : IProductService
 
     public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken = default)
     {
-        Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
+        Product? product = await productRepository.GetByIdAsync(id, cancellationToken);
 
         if (product is null)
         {
@@ -49,31 +45,37 @@ public sealed class ProductService : IProductService
 
         product.SetName(dto.Name);
 
-        await _productRepository.UpdateAsync(product, cancellationToken);
+        await productRepository.UpdateAsync(product, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return product.ToDto();
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
+        Product? product = await productRepository.GetByIdAsync(id, cancellationToken);
 
         if (product is null)
         {
             throw new NotFoundException(nameof(Product), id);
         }
 
-        await _productRepository.DeleteAsync(product, cancellationToken);
+        await productRepository.DeleteAsync(product, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<PagedResult<ProductDto>> GetPagedAsync(ProductQueryParams queryParams, CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<Product> products = await _productRepository.GetPagedAsync(queryParams, cancellationToken);
+        ProductQueryParams normalized = queryParams with
+        {
+            SortBy = queryParams.SortBy?.ToLowerInvariant(),
+        };
 
-        int totalCount = await _productRepository.CountAsync(queryParams, cancellationToken);
+        IReadOnlyList<Product> products = await productRepository.GetPagedAsync(normalized, cancellationToken);
+        int totalCount = await productRepository.CountAsync(normalized, cancellationToken);
 
         IReadOnlyList<ProductDto> items = products.Select(p => p.ToDto()).ToList();
 
-        return new PagedResult<ProductDto>(items, queryParams.Page, queryParams.PageSize, totalCount);
+        return new PagedResult<ProductDto>(items, normalized.Page, normalized.PageSize, totalCount);
     }
 }

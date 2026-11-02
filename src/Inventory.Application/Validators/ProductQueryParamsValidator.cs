@@ -3,7 +3,7 @@ using Inventory.Application.Queries;
 
 namespace Inventory.Application.Validators;
 
-public class ProductQueryParamsValidator : AbstractValidator<ProductQueryParams>
+public sealed class ProductQueryParamsValidator : AbstractValidator<ProductQueryParams>
 {
     public const int MaxPageSize = 100;
     public const int MaxSearchLength = 100;
@@ -17,11 +17,17 @@ public class ProductQueryParamsValidator : AbstractValidator<ProductQueryParams>
 
         RuleFor(x => x.Name)
             .MaximumLength(200)
-            .WithMessage("Name filter cannot exceed 200 characters.");
+            .WithMessage("Name filter cannot exceed 200 characters.")
+            .Must(NotContainWildcardCharacters)
+            .When(x => !string.IsNullOrWhiteSpace(x.Name))
+            .WithMessage("Name filter cannot contain wildcard characters (%, _, \\).");
 
         RuleFor(x => x.Q)
             .MaximumLength(MaxSearchLength)
-            .WithMessage($"Search term cannot exceed {MaxSearchLength} characters.");
+            .WithMessage($"Search term cannot exceed {MaxSearchLength} characters.")
+            .Must(NotContainWildcardCharacters)
+            .When(x => !string.IsNullOrWhiteSpace(x.Q))
+            .WithMessage("Search term cannot contain wildcard characters (%, _, \\).");
 
         RuleFor(x => x.SortBy)
             .Must(BeValidSortField)
@@ -49,5 +55,15 @@ public class ProductQueryParamsValidator : AbstractValidator<ProductQueryParams>
         }
 
         return ProductSortFields.All.Contains(sortBy, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static bool NotContainWildcardCharacters(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return true;
+        }
+
+        return !value.Contains('%') && !value.Contains('_') && !value.Contains('\\');
     }
 }

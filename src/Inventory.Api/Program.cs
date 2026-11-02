@@ -1,15 +1,17 @@
 using Inventory.Api.ExceptionHandlers;
-using Inventory.Api.Filters;
 using Inventory.Application;
 using Inventory.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ---Serilog---
+// --- Serilog ---
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
+    string seqUrl = context.Configuration["Serilog:SeqUrl"]
+        ?? throw new InvalidOperationException("Serilog:SeqUrl configuration is missing.");
+
     loggerConfiguration
         .ReadFrom.Configuration(context.Configuration)
         .Enrich.FromLogContext()
@@ -17,19 +19,14 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
         .Enrich.WithEnvironmentName()
         .WriteTo.Console(
             outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-        .WriteTo.Seq(context.Configuration["Serilog:SeqUrl"]!);
+        .WriteTo.Seq(seqUrl);
 });
 
 // --- Services ---
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<ValidationFilter>();
-});
+builder.Services.AddControllers();
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.SuppressModelStateInvalidFilter = true;
-});
+// FluentValidation auto-validation (replaces manual ValidationFilter)
+builder.Services.AddFluentValidationAutoValidation();
 
 // Problem Details (RFC 7807)
 builder.Services.AddProblemDetails();
@@ -50,13 +47,11 @@ app.UseSerilogRequestLogging();
 
 app.UseExceptionHandler();
 
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    // Swagger/OpenAPI will be added later as a schema-only endpoint.
-    // app.UseDeveloperExceptionPage();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 

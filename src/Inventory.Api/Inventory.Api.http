@@ -1,30 +1,74 @@
 @baseUrl = http://localhost:5000
 
-### Get all products (default page)
+#############################################
+# GET — Paged / Filtered / Sorted
+#############################################
+
+### Get all products (default page) (expected: 200)
 GET {{baseUrl}}/api/products
 Accept: application/json
 
-### Get all products (page 2, size 5)
+### Get all products (page 2, size 5) (expected: 200)
 GET {{baseUrl}}/api/products?page=2&pageSize=5
 Accept: application/json
 
-### Get all products (pageSize exceeds max, clamped to 100)
+### Get all products (no filter) (expected: 200)
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+#############################################
+# GET — Validation errors (expected: 400)
+#############################################
+
+### Invalid page size (too large) (expected: 400)
 GET {{baseUrl}}/api/products?page=1&pageSize=99999
 Accept: application/json
 
-### Get all products (invalid page, clamped to 1)
+### Invalid page (negative) (expected: 400)
 GET {{baseUrl}}/api/products?page=-5&pageSize=10
 Accept: application/json
 
-### Get product by id (existing)
+### Invalid page (zero) (expected: 400)
+GET {{baseUrl}}/api/products?page=0
+Accept: application/json
+
+### Invalid page size (zero) (expected: 400)
+GET {{baseUrl}}/api/products?pageSize=0
+Accept: application/json
+
+### Invalid id (negative) (expected: 400)
+GET {{baseUrl}}/api/products?id=-5
+Accept: application/json
+
+### Invalid sortBy (expected: 400)
+GET {{baseUrl}}/api/products?sortBy=password
+Accept: application/json
+
+### Invalid sortDir (expected: 400)
+GET {{baseUrl}}/api/products?sortBy=name&sortDir=invalid
+Accept: application/json
+
+### Search term too long (expected: 400)
+GET {{baseUrl}}/api/products?q=abcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyz
+Accept: application/json
+
+#############################################
+# GET — By id
+#############################################
+
+### Get product by id (existing) (expected: 200)
 GET {{baseUrl}}/api/products/2
 Accept: application/json
 
-### Get product by id (not found)
+### Get product by id (not found) (expected: 404)
 GET {{baseUrl}}/api/products/99999
 Accept: application/json
 
-### Create product
+#############################################
+# POST — Create
+#############################################
+
+### Create product (expected: 201)
 POST {{baseUrl}}/api/products
 Content-Type: application/json
 
@@ -32,7 +76,7 @@ Content-Type: application/json
   "name": "Create me"
 }
 
-### Create product - validation error (empty name)
+### Create product — validation error (empty name) (expected: 400)
 POST {{baseUrl}}/api/products
 Content-Type: application/json
 
@@ -40,7 +84,7 @@ Content-Type: application/json
   "name": ""
 }
 
-### Create product - validation error (too long)
+### Create product — validation error (too long) (expected: 400)
 POST {{baseUrl}}/api/products
 Content-Type: application/json
 
@@ -48,15 +92,19 @@ Content-Type: application/json
   "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 }
 
-### Update product
-PUT {{baseUrl}}/api/products/16
+#############################################
+# PUT — Update
+#############################################
+
+### Update product (expected: 200)
+PUT {{baseUrl}}/api/products/15
 Content-Type: application/json
 
 {
   "name": "Updated"
 }
 
-### Update product - not found
+### Update product — not found (expected: 404)
 PUT {{baseUrl}}/api/products/99999
 Content-Type: application/json
 
@@ -64,7 +112,7 @@ Content-Type: application/json
   "name": "Nope"
 }
 
-### Update product - validation error
+### Update product — validation error (empty name) (expected: 400)
 PUT {{baseUrl}}/api/products/1
 Content-Type: application/json
 
@@ -72,113 +120,92 @@ Content-Type: application/json
   "name": ""
 }
 
-### Delete product
-DELETE {{baseUrl}}/api/products/16
+#############################################
+# DELETE
+#############################################
 
-### Delete product - not found
+### Delete product (expected: 204)
+DELETE {{baseUrl}}/api/products/15
+
+### Delete product — not found (expected: 404)
 DELETE {{baseUrl}}/api/products/99999
 
-### Verify product is deleted
-GET {{baseUrl}}/api/products/1
-
-### Get all products (no filter)
-GET {{baseUrl}}/api/products
+### Verify product is deleted (expected: 404)
+GET {{baseUrl}}/api/products/16
 Accept: application/json
 
-### Filter by id
-GET {{baseUrl}}/api/products?id=2
-Accept: application/json
+#############################################
+# GET — Filter by name
+#############################################
 
-### Filter by name (contains, case-insensitive)
+### Filter by name (contains, case-insensitive) (expected: 200)
 GET {{baseUrl}}/api/products?name=KaLem
 Accept: application/json
 
-### Filter by name + pagination
+### Filter by name + pagination (expected: 200)
 GET {{baseUrl}}/api/products?name=kalem&page=1&pageSize=5
 Accept: application/json
 
-### Filter that matches nothing
+### Filter that matches nothing (expected: 200)
 GET {{baseUrl}}/api/products?name=nothing
 Accept: application/json
 
-### Sort by id ascending (default)
+#############################################
+# GET — Sorting
+#############################################
+
+### Sort by id ascending (default) (expected: 200)
 GET {{baseUrl}}/api/products?sortBy=id&sortDir=asc
 Accept: application/json
 
-### Sort by id descending
+### Sort by id descending (expected: 200)
 GET {{baseUrl}}/api/products?sortBy=id&sortDir=desc
 Accept: application/json
 
-### Sort by name ascending
+### Sort by name ascending (expected: 200)
 GET {{baseUrl}}/api/products?sortBy=name&sortDir=asc
 Accept: application/json
 
-### Sort by name descending
+### Sort by name descending (expected: 200)
 GET {{baseUrl}}/api/products?sortBy=name&sortDir=desc
 Accept: application/json
 
-### Sort by name descending with filter and pagination
+### Sort by name descending with filter and pagination (expected: 200)
 GET {{baseUrl}}/api/products?name=kalem&sortBy=name&sortDir=desc&page=1&pageSize=5
 Accept: application/json
 
-### Invalid sortBy (falls back to id)
-GET {{baseUrl}}/api/products?sortBy=password&sortDir=asc
-Accept: application/json
-
-### Invalid sortDir (should be 400)
-GET {{baseUrl}}/api/products?sortBy=name&sortDir=invalid
-Accept: application/json
-
-### Search by keyword (q)
-GET {{baseUrl}}/api/products?q=kalem
-Accept: application/json
-
-### Search + sort + pagination
-GET {{baseUrl}}/api/products?q=kalem&sortBy=name&sortDir=asc&page=1&pageSize=5
-Accept: application/json
-
-### Search + name filter combined (both must match)
-GET {{baseUrl}}/api/products?q=kalem&name=kirmizi
-Accept: application/json
-
-### Search that matches nothing
-GET {{baseUrl}}/api/products?q=zzzzzzzzzz
-Accept: application/json
-
-### Search is case - insensitive
-GET {{baseUrl}}/api/products?q=KALEM
-Accept: application/json
-
-### Invalid sortBy (should be 400)
-GET {{baseUrl}}/api/products?sortBy=password
-Accept: application/json
-
-### Invalid page (should be 400)
-GET {{baseUrl}}/api/products?page=0
-Accept: application/json
-
-### Invalid page size (too large, should be 400)
-GET {{baseUrl}}/api/products?pageSize=99999
-Accept: application/json
-
-### Invalid page size (zero, should be 400)
-GET {{baseUrl}}/api/products?pageSize=0
-Accept: application/json
-
-### Invalid id (negative, should be 400)
-GET {{baseUrl}}/api/products?id=-5
-Accept: application/json
-
-### Search term too long (should be 400)
-GET {{baseUrl}}/api/products?q=abcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyz
-Accept: application/json
-
-### Valid query (should be 200)
-GET {{baseUrl}}/api/products?sortBy=name&sortDir=desc&page=1&pageSize=10&q=kalem
-Accept:  application/json
-
-### Empty sortBy (should be 200, defaults to id)
+### Empty sortBy (defaults to id) (expected: 200)
 GET {{baseUrl}}/api/products?sortBy=
 Accept: application/json
 
+#############################################
+# GET — Search (q)
+#############################################
 
+### Search by keyword (q) (expected: 200)
+GET {{baseUrl}}/api/products?q=kalem
+Accept: application/json
+
+### Search + sort + pagination (expected: 200)
+GET {{baseUrl}}/api/products?q=kalem&sortBy=name&sortDir=asc&page=1&pageSize=5
+Accept: application/json
+
+### Search + name filter combined (both must match) (expected: 200)
+GET {{baseUrl}}/api/products?q=kalem&name=kirmizi
+Accept: application/json
+
+### Search that matches nothing (expected: 200)
+GET {{baseUrl}}/api/products?q=zzzzzzzzzz
+Accept: application/json
+
+### Search is case-insensitive (expected: 200)
+GET {{baseUrl}}/api/products?q=KALEM
+Accept: application/json
+
+#############################################
+# GET — Combined valid query
+#############################################
+
+### Valid query (sort + pagination + search) (expected: 200)
+GET {{baseUrl}}/api/products?sortBy=name&sortDir=desc&page=1&pageSize=10&q=kalem
+Accept: application/json

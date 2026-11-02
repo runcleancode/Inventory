@@ -7,7 +7,7 @@
 ![Seq](https://img.shields.io/badge/Seq-2024-4B0082?logo=seq&logoColor=white)
 ![Adminer](https://img.shields.io/badge/Adminer-latest-5A5A5A)
 
-A Restful Web API built with ASP.NET Core (.NET 10) following Clean Architecture principles.
+A RESTful Web API built with ASP.NET Core (.NET 10) following Clean Architecture principles.
 
 ## Tech Stack
 
@@ -71,17 +71,41 @@ When you run `docker compose up -d`, the following services are started:
 ### Phase 2 — Full CRUD + Quality (Done)
 
 * Full CRUD endpoints (Get by id, Get paged, POST, PUT, DELETE)
-* Off-set based pagination with 'PagedResult<T>'
-* FluentValidation with global ValidationFilter
+* Off-set based pagination with `PagedResult<T>`
+* FluentValidation auto-validation (SharpGrip)
 * Global exception handling with ProblemDetails (RFC 7807)
 * Structured logging with Serilog + Seq
 * Application and Infrastructure DI extensions
-* Manual mapping via extension methods (no Automapper)
+* Manual mapping via extension methods (no AutoMapper)
 * Conventional Commits with scoped messages
+
+### Phase R1 — Full Codebase Refactoring (Done)
+
+* Removed XML support entirely (JSON-only)
+* Introduced `IUnitOfWork`; repositories no longer call `SaveChanges`
+* Domain exceptions (`DomainException`) mapped to HTTP 400
+* `AppException` now carries `StatusCode` and `PublicMessage`
+* Single source of truth for `Product.NameMaxLength`
+* Controller metadata corrected (`[FromQuery]`, typed `ProducesResponseType`)
+* Dev connection string moved to `appsettings.Development.json`
+* EF Core packages aligned to `10.0.4` (Npgsql 10.0.3 compatibility)
+* `.http` test suite cleaned up and standardized
+
+### Phase 3 — Advanced REST (In Progress)
+
+* PATCH (JSON Merge Patch)
+* HATEOAS
+* API versioning
+* Response caching (ETag) + in-memory caching
+* Rate limiting
+* Options pattern
 
 ### Roadmap
 
-* Phase 3 — Advanced REST (PATCH, content negotiation, HATEOAS, versioning, caching, rate limiting)
 * Phase 4 — Security (JWT, authorization policies, refresh tokens)
 * Phase 5 — Testing (xUnit, integration tests, Testcontainers)
 * Phase 6 — CI/CD (GitHub Actions, Docker build, deployment)
+```
+
+---
+

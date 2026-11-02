@@ -11,7 +11,6 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
     public async Task<Product> AddAsync(Product product, CancellationToken cancellationToken = default)
     {
         await context.AddAsync(product, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
 
         return product;
     }
@@ -25,13 +24,11 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
     public async Task DeleteAsync(Product product, CancellationToken cancellationToken = default)
     {
         context.Products.Remove(product);
-        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await context.Products
-            .AsNoTracking()
             .FirstOrDefaultAsync(product => product.Id == id, cancellationToken);
     }
 
@@ -43,11 +40,9 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
             .ToListAsync(cancellationToken);
     }
 
-
     public async Task UpdateAsync(Product product, CancellationToken cancellationToken = default)
     {
         context.Products.Update(product);
-        await context.SaveChangesAsync(cancellationToken);
     }
 
     private static IQueryable<Product> ApplyFilters(IQueryable<Product> query, ProductQueryParams queryParams)
@@ -77,7 +72,7 @@ internal sealed class ProductRepository(AppDbContext context) : IProductReposito
     {
         bool descending = queryParams.SortDir == SortDirection.Desc;
 
-        return queryParams.SortBy?.ToLowerInvariant() switch
+        return queryParams.SortBy switch
         {
             ProductSortFields.Id => descending
                 ? query.OrderByDescending(product => product.Id)

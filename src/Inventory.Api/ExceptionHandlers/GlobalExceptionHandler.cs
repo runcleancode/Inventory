@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Inventory.Application.Common.Exceptions;
+using Inventory.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +15,10 @@ internal sealed class GlobalExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
+        int statusCode;
+        string title;
+        string detail;
+
         if (exception is AppException appException)
         {
             logger.LogWarning(
@@ -20,6 +26,22 @@ internal sealed class GlobalExceptionHandler(
                 "Application exception: {ExceptionType} TraceId: {TraceId}",
                 appException.GetType().Name,
                 httpContext.TraceIdentifier);
+
+            statusCode = appException.StatusCode;
+            title = statusCode == 404 ? "Resource not found" : "Application error";
+            detail = appException.PublicMessage;
+        }
+        else if (exception is DomainException domainException)
+        {
+            logger.LogWarning(
+                domainException,
+                "Domain exception: {ExceptionType} TraceId: {TraceId}",
+                domainException.GetType().Name,
+                httpContext.TraceIdentifier);
+
+            statusCode = StatusCodes.Status400BadRequest;
+            title = "Domain rule violated";
+            detail = domainException.Message;
         }
         else
         {
@@ -27,29 +49,25 @@ internal sealed class GlobalExceptionHandler(
                 exception,
                 "Unhandled exception occurred. TraceId: {TraceId}",
                 httpContext.TraceIdentifier);
+
+            statusCode = StatusCodes.Status500InternalServerError;
+            title = "An unexpected error occurred";
+            detail = "An internal server error occurred. Please contact support with the trace id.";
         }
 
-        int statusCode = exception switch
-        {
-            NotFoundException => StatusCodes.Status404NotFound,
-            _ => StatusCodes.Status500InternalServerError,
-        };
-
         httpContext.Response.StatusCode = statusCode;
+
+        string traceId = Activity.Current?.Id ?? httpContext.TraceIdentifier;
 
         ProblemDetails problemDetails = new()
         {
             Status = statusCode,
-            Title = statusCode == StatusCodes.Status404NotFound
-                ? "Resource not found"
-                : "An unexpected error occurred",
-            Detail = statusCode == StatusCodes.Status404NotFound
-                ? exception.Message
-                : "An internal server error occurred. Please contact support with the trace id.",
+            Title = title,
+            Detail = detail,
             Instance = httpContext.Request.Path,
             Extensions =
             {
-                ["traceId"] = httpContext.TraceIdentifier,
+                ["traceId"] = traceId,
             },
         };
 

@@ -12,7 +12,7 @@ public sealed class ProductsController(IProductService productService) : Control
 {
     [HttpGet("{id:int}", Name = "GetProductById")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDto>> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         ProductDto product = await productService.GetByIdAsync(id, cancellationToken);
@@ -22,7 +22,7 @@ public sealed class ProductsController(IProductService productService) : Control
 
     [HttpPost]
     [ProducesResponseType<ProductDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductDto>> CreateAsync(CreateProductDto dto, CancellationToken cancellationToken)
     {
         ProductDto created = await productService.CreateAsync(dto, cancellationToken);
@@ -35,8 +35,8 @@ public sealed class ProductsController(IProductService productService) : Control
 
     [HttpPut("{id:int}")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDto>> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken)
     {
         ProductDto updated = await productService.UpdateAsync(id, dto, cancellationToken);
@@ -46,7 +46,7 @@ public sealed class ProductsController(IProductService productService) : Control
 
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
     {
         await productService.DeleteAsync(id, cancellationToken);
@@ -56,13 +56,13 @@ public sealed class ProductsController(IProductService productService) : Control
 
     [HttpGet(Name = "GetProducts")]
     [ProducesResponseType<PagedResult<ProductDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PagedResult<ProductDto>>> GetAllAsync(
-       [FromQuery] ProductQueryParams queryParams,
-        CancellationToken cancellationToken = default)
+        [FromQuery] ProductQueryParams queryParams,
+        CancellationToken cancellationToken)
     {
         PagedResult<ProductDto> result = await productService.GetPagedAsync(queryParams, cancellationToken);
 
         return Ok(result);
     }
 }
-

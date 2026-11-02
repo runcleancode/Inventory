@@ -1,11 +1,15 @@
+using Inventory.Domain.Exceptions;
+
 namespace Inventory.Domain.Entities;
 
-public class Product
+public sealed class Product
 {
+    public const int NameMaxLength = 200;
+
     public int Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
 
-    //Required by EF Core for materialization (do not use application code)
+    // Required by EF Core for materialization (do not use in application code)
     private Product() { }
 
     public Product(string name)
@@ -17,9 +21,16 @@ public class Product
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Product name cannot be empty.", nameof(name));
+            throw new DomainException("Product name cannot be empty.");
         }
 
-        Name = name.Trim();
+        string trimmed = name.Trim();
+
+        if (trimmed.Length > NameMaxLength)
+        {
+            throw new DomainException($"Product name cannot exceed {NameMaxLength} characters.");
+        }
+
+        Name = trimmed;
     }
 }

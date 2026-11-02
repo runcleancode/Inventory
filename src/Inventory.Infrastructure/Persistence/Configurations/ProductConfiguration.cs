@@ -13,12 +13,11 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(product => product.Id);
 
         builder.Property(product => product.Id)
-            .HasColumnName("id")
-            .ValueGeneratedOnAdd();
+            .HasColumnName("id");
 
         builder.Property(product => product.Name)
             .HasColumnName("name")
-            .HasMaxLength(200)
+            .HasMaxLength(Product.NameMaxLength)
             .IsRequired();
     }
 }
