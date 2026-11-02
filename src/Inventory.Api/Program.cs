@@ -26,7 +26,10 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
     options.InputFormatters.Insert(0, new MergePatchInputFormatter());
-});
+    options.RespectBrowserAcceptHeader = true;
+    options.ReturnHttpNotAcceptable = true;
+})
+.AddXmlSerializerFormatters();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

@@ -72,7 +72,7 @@ public sealed class ProductService : IProductService
 
         int totalCount = await _productRepository.CountAsync(queryParams, cancellationToken);
 
-        IReadOnlyList<ProductDto> items = products.Select(p => p.ToDto()).ToList();
+        List<ProductDto> items = products.Select(p => p.ToDto()).ToList();
 
         return new PagedResult<ProductDto>(items, queryParams.Page, queryParams.PageSize, totalCount);
     }

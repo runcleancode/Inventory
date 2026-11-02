@@ -243,5 +243,50 @@ Content-Type: application/json
     "name" : "test"
 }
 
+### Get product - JSON (Accept: application/json)
+GET {{baseUrl}}/api/products/2
+Accept: application/json
+
+### Get product- XML (Accept: application/xml)
+GET {{baseUrl}}/api/products/2
+Accept: application/xml
+
+### Get product- unsupported Accept (should be 406)
+GET {{baseUrl}}/api/products/2
+Accept: application/pdf
+
+### Get all products - XML
+GET {{baseUrl}}/api/products
+Accept: application/xml
+
+### Get all products -XML with (page 2, size 5)
+GET {{baseUrl}}/api/products?page=2&pageSize=5
+Accept: application/xml
+
+### Post product with Accept: application/xml (should be 406)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Accept: application/xml
+
+{
+    "name" : "Should fail"
+}
+
+### Post product with Accept: application/json (should be 201)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name" : "Should succeed"
+}
+
+
+
+
+
+
+
+
 
 

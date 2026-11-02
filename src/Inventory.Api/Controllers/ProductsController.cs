@@ -21,6 +21,7 @@ public sealed class ProductsController(IProductService productService) : Control
     }
 
     [HttpPost]
+    [Produces("application/json")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductDto>> CreateAsync(CreateProductDto dto, CancellationToken cancellationToken)
@@ -67,6 +68,7 @@ public sealed class ProductsController(IProductService productService) : Control
 
     [HttpPatch("{id:int}")]
     [Consumes("application/merge-patch+json")]
+    [Produces("application/json")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
