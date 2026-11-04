@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Inventory.Api.ExceptionHandlers;
 using Inventory.Api.Filters;
 using Inventory.Application;
@@ -29,6 +30,20 @@ builder.Services.AddControllers(options =>
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
+});
+
+// API Versioning (URL - segment only)
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+})
+.AddMvc()
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
 });
 
 // Problem Details (RFC 7807)
