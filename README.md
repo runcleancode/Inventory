@@ -79,9 +79,19 @@ When you run `docker compose up -d`, the following services are started:
 * Manual mapping via extension methods (no Automapper)
 * Conventional Commits with scoped messages
 
+### Phase 3 - Advanced REST (in Progress)
+* Query parameters validation with fail-fast behaviour (no clamping)
+* Shared sort whitelist (`ProductSortFields`) as single source of truth
+* PATCH endpoint with DTO-based partial update (idempodent, null = no-op)
+* API versioning URL-based (`/api/v1/products`), single `UrlSegmentApiVersionReader`
+* `api-supported-versions`response header via `ReportApiVersions`
+* Unversioned URL (`/api/products`) returns 404 by design (no legacy clients)
+* 3.6 - XML Content Negotiation: Removed. Immutable `record` DTOs are incompatible with `XmlSerializer` / `DataContractSerializer`, and global XML demand is negligible.
+* HATEOAS, HTTP caching, in-memory caching, rate limiting, options pattern-pending  
+
 ### Roadmap
 
-* Phase 3 — Advanced REST (PATCH, content negotiation, HATEOAS, versioning, caching, rate limiting)
+* Phase 3 — Advanced REST (HATEOAS, caching, rate limiting, options pattern)
 * Phase 4 — Security (JWT, authorization policies, refresh tokens)
 * Phase 5 — Testing (xUnit, integration tests, Testcontainers)
 * Phase 6 — CI/CD (GitHub Actions, Docker build, deployment)

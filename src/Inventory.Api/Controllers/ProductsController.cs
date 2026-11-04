@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
 using Inventory.Application.Interfaces;
@@ -6,8 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet("{id:int}", Name = "GetProductById")]
@@ -29,7 +31,7 @@ public sealed class ProductsController(IProductService productService) : Control
 
         return CreatedAtRoute(
             routeName: "GetProductById",
-            routeValues: new { id = created.Id },
+            routeValues: new { id = created.Id, version = "1.0" },
             value: created);
     }
 

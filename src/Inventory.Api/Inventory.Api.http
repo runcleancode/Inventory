@@ -1,229 +1,302 @@
 @baseUrl = http://localhost:5000
 
-### Get all products (default page)
-GET {{baseUrl}}/api/products
+# ==========================================
+# 1. PRODUCTS - RETRIEVAL (GET)
+# ==========================================
+
+### Get all products (Default pagination)
+GET {{baseUrl}}/api/v1/products
 Accept: application/json
 
-### Get all products (page 2, size 5)
-GET {{baseUrl}}/api/products?page=2&pageSize=5
+### Get all products with custom pagination (Page 2, Size 5)
+GET {{baseUrl}}/api/v1/products?page=2&pageSize=5
 Accept: application/json
 
-### Get all products (pageSize exceeds max, clamped to 100)
-GET {{baseUrl}}/api/products?page=1&pageSize=99999
+### Get all products - Page size exceeds maximum (Expected: Clamped to 100)
+GET {{baseUrl}}/api/v1/products?page=1&pageSize=99999
 Accept: application/json
 
-### Get all products (invalid page, clamped to 1)
-GET {{baseUrl}}/api/products?page=-5&pageSize=10
+### Get all products - Invalid page number (Expected: Clamped to 1)
+GET {{baseUrl}}/api/v1/products?page=-5&pageSize=10
 Accept: application/json
 
-### Get product by id (existing)
-GET {{baseUrl}}/api/products/2
+### Get product by ID (Existing)
+GET {{baseUrl}}/api/v1/products/2
 Accept: application/json
 
-### Get product by id (not found)
-GET {{baseUrl}}/api/products/99999
+### Get product by ID - Not found (Expected: 404 Not Found)
+GET {{baseUrl}}/api/v1/products/99999
 Accept: application/json
 
-### Create product
-POST {{baseUrl}}/api/products
+
+# ==========================================
+# 2. PRODUCTS - FILTERING, SORTING & SEARCH
+# ==========================================
+
+### Filter products by ID
+GET {{baseUrl}}/api/v1/products?id=2
+Accept: application/json
+
+### Filter products by name (Contains, case-insensitive)
+GET {{baseUrl}}/api/v1/products?name=KaLem
+Accept: application/json
+
+### Filter products by name combined with pagination
+GET {{baseUrl}}/api/v1/products?name=kalem&page=1&pageSize=5
+Accept: application/json
+
+### Filter products - No matches found
+GET {{baseUrl}}/api/v1/products?name=nothing
+Accept: application/json
+
+### Sort products by ID ascending (Default)
+GET {{baseUrl}}/api/v1/products?sortBy=id&sortDir=asc
+Accept: application/json
+
+### Sort products by ID descending
+GET {{baseUrl}}/api/v1/products?sortBy=id&sortDir=desc
+Accept: application/json
+
+### Sort products by name ascending
+GET {{baseUrl}}/api/v1/products?sortBy=name&sortDir=asc
+Accept: application/json
+
+### Sort products by name descending
+GET {{baseUrl}}/api/v1/products?sortBy=name&sortDir=desc
+Accept: application/json
+
+### Sort products by name descending with filter and pagination
+GET {{baseUrl}}/api/v1/products?name=kalem&sortBy=name&sortDir=desc&page=1&pageSize=5
+Accept: application/json
+
+### Search products by keyword (q)
+GET {{baseUrl}}/api/v1/products?q=kalem
+Accept: application/json
+
+### Search combined with sort and pagination
+GET {{baseUrl}}/api/v1/products?q=kalem&sortBy=name&sortDir=asc&page=1&pageSize=5
+Accept: application/json
+
+### Search combined with name filter (Both must match)
+GET {{baseUrl}}/api/v1/products?q=kalem&name=kirmizi
+Accept: application/json
+
+### Search products - Case-insensitive check
+GET {{baseUrl}}/api/v1/products?q=KALEM
+Accept: application/json
+
+### Search products - No matches found
+GET {{baseUrl}}/api/v1/products?q=zzzzzzzzzz
+Accept: application/json
+
+### Complex valid query combining search, sort, pagination (Expected: 200 OK)
+GET {{baseUrl}}/api/v1/products?sortBy=name&sortDir=desc&page=1&pageSize=10&q=kalem
+Accept: application/json
+
+### Empty sortBy parameter (Expected: 200 OK, defaults to ID)
+GET {{baseUrl}}/api/v1/products?sortBy=
+Accept: application/json
+
+
+# ==========================================
+# 3. PRODUCTS - CREATION (POST)
+# ==========================================
+
+### Create product successfully
+POST {{baseUrl}}/api/v1/products
 Content-Type: application/json
 
 {
-  "name": "Create me"
+  "name": "New Product"
 }
 
-### Create product - validation error (empty name)
-POST {{baseUrl}}/api/products
+### Create product - Validation error: Empty name (Expected: 400 Bad Request)
+POST {{baseUrl}}/api/v1/products
 Content-Type: application/json
 
 {
   "name": ""
 }
 
-### Create product - validation error (too long)
-POST {{baseUrl}}/api/products
+### Create product - Validation error: Name too long (Expected: 400 Bad Request)
+POST {{baseUrl}}/api/v1/products
 Content-Type: application/json
 
 {
   "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 }
 
-### Update product
-PUT {{baseUrl}}/api/products/16
+
+# ==========================================
+# 4. PRODUCTS - FULL UPDATE (PUT)
+# ==========================================
+
+### Update product completely
+PUT {{baseUrl}}/api/v1/products/16
 Content-Type: application/json
 
 {
-  "name": "Updated"
+  "name": "Updated Product"
 }
 
-### Update product - not found
-PUT {{baseUrl}}/api/products/99999
+### Update product - Not found (Expected: 404 Not Found)
+PUT {{baseUrl}}/api/v1/products/99999
 Content-Type: application/json
 
 {
   "name": "Nope"
 }
 
-### Update product - validation error
-PUT {{baseUrl}}/api/products/1
+### Update product - Validation error: Empty name (Expected: 400 Bad Request)
+PUT {{baseUrl}}/api/v1/products/1
 Content-Type: application/json
 
 {
   "name": ""
 }
 
-### Delete product
-DELETE {{baseUrl}}/api/products/16
 
-### Delete product - not found
-DELETE {{baseUrl}}/api/products/99999
+# ==========================================
+# 5. PRODUCTS - PARTIAL UPDATE (PATCH)
+# ==========================================
 
-### Verify product is deleted
-GET {{baseUrl}}/api/products/1
-
-### Get all products (no filter)
-GET {{baseUrl}}/api/products
-Accept: application/json
-
-### Filter by id
-GET {{baseUrl}}/api/products?id=2
-Accept: application/json
-
-### Filter by name (contains, case-insensitive)
-GET {{baseUrl}}/api/products?name=KaLem
-Accept: application/json
-
-### Filter by name + pagination
-GET {{baseUrl}}/api/products?name=kalem&page=1&pageSize=5
-Accept: application/json
-
-### Filter that matches nothing
-GET {{baseUrl}}/api/products?name=nothing
-Accept: application/json
-
-### Sort by id ascending (default)
-GET {{baseUrl}}/api/products?sortBy=id&sortDir=asc
-Accept: application/json
-
-### Sort by id descending
-GET {{baseUrl}}/api/products?sortBy=id&sortDir=desc
-Accept: application/json
-
-### Sort by name ascending
-GET {{baseUrl}}/api/products?sortBy=name&sortDir=asc
-Accept: application/json
-
-### Sort by name descending
-GET {{baseUrl}}/api/products?sortBy=name&sortDir=desc
-Accept: application/json
-
-### Sort by name descending with filter and pagination
-GET {{baseUrl}}/api/products?name=kalem&sortBy=name&sortDir=desc&page=1&pageSize=5
-Accept: application/json
-
-### Invalid sortBy (falls back to id)
-GET {{baseUrl}}/api/products?sortBy=password&sortDir=asc
-Accept: application/json
-
-### Invalid sortDir (should be 400)
-GET {{baseUrl}}/api/products?sortBy=name&sortDir=invalid
-Accept: application/json
-
-### Search by keyword (q)
-GET {{baseUrl}}/api/products?q=kalem
-Accept: application/json
-
-### Search + sort + pagination
-GET {{baseUrl}}/api/products?q=kalem&sortBy=name&sortDir=asc&page=1&pageSize=5
-Accept: application/json
-
-### Search + name filter combined (both must match)
-GET {{baseUrl}}/api/products?q=kalem&name=kirmizi
-Accept: application/json
-
-### Search that matches nothing
-GET {{baseUrl}}/api/products?q=zzzzzzzzzz
-Accept: application/json
-
-### Search is case - insensitive
-GET {{baseUrl}}/api/products?q=KALEM
-Accept: application/json
-
-### Invalid sortBy (should be 400)
-GET {{baseUrl}}/api/products?sortBy=password
-Accept: application/json
-
-### Invalid page (should be 400)
-GET {{baseUrl}}/api/products?page=0
-Accept: application/json
-
-### Invalid page size (too large, should be 400)
-GET {{baseUrl}}/api/products?pageSize=99999
-Accept: application/json
-
-### Invalid page size (zero, should be 400)
-GET {{baseUrl}}/api/products?pageSize=0
-Accept: application/json
-
-### Invalid id (negative, should be 400)
-GET {{baseUrl}}/api/products?id=-5
-Accept: application/json
-
-### Search term too long (should be 400)
-GET {{baseUrl}}/api/products?q=abcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyz
-Accept: application/json
-
-### Valid query (should be 200)
-GET {{baseUrl}}/api/products?sortBy=name&sortDir=desc&page=1&pageSize=10&q=kalem
-Accept:  application/json
-
-### Empty sortBy (should be 200, defaults to id)
-GET {{baseUrl}}/api/products?sortBy=
-Accept: application/json
-
-### Patch product - update name
-PATCH {{baseUrl}}/api/products/2
+### Patch product - Update name only
+PATCH {{baseUrl}}/api/v1/products/2
 Content-Type: application/json
 
 {
-    "name" : "Patched Name"
+  "name": "Patched Name"
 }
 
-### Patch product - no fields (should be 200, no-op)
-PATCH {{baseUrl}}/api/products/2
+### Patch product - No fields provided (Expected: 200 OK, No-op)
+PATCH {{baseUrl}}/api/v1/products/2
 Content-Type: application/json
 
 {}
 
-### Patch product - empty name (should be 400)
-PATCH {{baseUrl}}/api/products/2
+### Patch product - Null name (Expected: 200 OK, No-op)
+PATCH {{baseUrl}}/api/v1/products/2
 Content-Type: application/json
 
 {
-    "name" : ""
+  "name": null
 }
 
-### Patch product - null name (should be 200, no op)
-PATCH {{baseUrl}}/api/products/2
+### Patch product - Validation error: Empty name (Expected: 400 Bad Request)
+PATCH {{baseUrl}}/api/v1/products/2
 Content-Type: application/json
 
 {
-    "name" : null
+  "name": ""
 }
 
-### Patch product - too long name (should be 400)
-PATCH {{baseUrl}}/api/products/2
+### Patch product - Validation error: Name too long (Expected: 400 Bad Request)
+PATCH {{baseUrl}}/api/v1/products/2
 Content-Type: application/json
 
 {
   "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 }
 
-### Patch product - not found (should be 404)
-PATCH {{baseUrl}}/api/products/99999
+### Patch product - Not found (Expected: 404 Not Found)
+PATCH {{baseUrl}}/api/v1/products/99999
 Content-Type: application/json
 
 {
-    "name" : "Nope"
+  "name": "Nope"
 }
 
+
+# ==========================================
+# 6. PRODUCTS - DELETION (DELETE)
+# ==========================================
+
+### Delete product successfully
+DELETE {{baseUrl}}/api/v1/products/16
+
+### Delete product - Not found (Expected: 404 Not Found)
+DELETE {{baseUrl}}/api/v1/products/99999
+
+### Verify product deletion (Expected: 404 Not Found)
+GET {{baseUrl}}/api/v1/products/1
+
+
+# ==========================================
+# 7. VALIDATION & ERROR HANDLING (400 Bad Request)
+# ==========================================
+
+### Invalid sortBy field (Expected: Falls back to ID or 400 depending on rules)
+GET {{baseUrl}}/api/v1/products?sortBy=password
+Accept: application/json
+
+### Invalid sortDir parameter (Expected: 400 Bad Request)
+GET {{baseUrl}}/api/v1/products?sortBy=name&sortDir=invalid
+Accept: application/json
+
+### Invalid page number (Expected: 400 Bad Request)
+GET {{baseUrl}}/api/v1/products?page=0
+Accept: application/json
+
+### Invalid page size - Too large (Expected: 400 Bad Request)
+GET {{baseUrl}}/api/v1/products?pageSize=99999
+Accept: application/json
+
+### Invalid page size - Zero (Expected: 400 Bad Request)
+GET {{baseUrl}}/api/v1/products?pageSize=0
+Accept: application/json
+
+### Invalid ID - Negative value (Expected: 400 Bad Request)
+GET {{baseUrl}}/api/v1/products?id=-5
+Accept: application/json
+
+### Search term too long (Expected: 400 Bad Request)
+GET {{baseUrl}}/api/v1/products?q=abcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyzabcdefghijklmnoprstxvyz
+Accept: application/json
+
+
+# ==========================================
+# 8. API VERSIONING & ROUTING TESTS
+# ==========================================
+
+### Get products (API v1)
+GET {{baseUrl}}/api/v1/products
+Accept: application/json
+
+### Get product by ID (API v1)
+GET {{baseUrl}}/api/v1/products/2
+Accept: application/json
+
+### Create product (API v1)
+POST {{baseUrl}}/api/v1/products
+Content-Type: application/json
+
+{
+  "name": "Versioned Product"
+}
+
+### Update product (API v1)
+PUT {{baseUrl}}/api/v1/products/2
+Content-Type: application/json
+
+{
+  "name": "Updated v1"
+}
+
+### Patch product (API v1)
+PATCH {{baseUrl}}/api/v1/products/2
+Content-Type: application/json
+
+{
+  "name": "Patched v1"
+}
+
+### Delete product (API v1)
+DELETE {{baseUrl}}/api/v1/products/32
+
+### Get products - Unsupported version (Expected: 404 Not Found)
+GET {{baseUrl}}/api/v99/products
+Accept: application/json
+
+### Get products - Missing version segment (Expected: 404 Not Found)
+GET {{baseUrl}}/api/products
+Accept: application/json
