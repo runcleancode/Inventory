@@ -76,4 +76,20 @@ public sealed class ProductService : IProductService
 
         return new PagedResult<ProductDto>(items, queryParams.Page, queryParams.PageSize, totalCount);
     }
+
+    public async Task<ProductDto> PatchAsync(int id, PatchProductDto dto, CancellationToken cancellationToken = default)
+    {
+        Product? product = await _productRepository.GetByIdAsync(id, cancellationToken);
+
+        if (product is null)
+        {
+            throw new NotFoundException(nameof(Product), id);
+        }
+
+        product.UpdateName(dto.Name);
+
+        await _productRepository.UpdateAsync(product, cancellationToken);
+
+        return product.ToDto();
+    }
 }

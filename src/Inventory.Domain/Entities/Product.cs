@@ -5,7 +5,6 @@ public class Product
     public int Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
 
-    //Required by EF Core for materialization (do not use application code)
     private Product() { }
 
     public Product(string name)
@@ -21,5 +20,15 @@ public class Product
         }
 
         Name = name.Trim();
+    }
+
+    public void UpdateName(string? name)
+    {
+        if (name is null)
+        {
+            return;
+        }
+
+        SetName(name);
     }
 }

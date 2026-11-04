@@ -11,4 +11,6 @@ public interface IProductService
     Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken = default);
     Task DeleteAsync(int id, CancellationToken cancellationToken = default);
     Task<PagedResult<ProductDto>> GetPagedAsync(ProductQueryParams queryParams, CancellationToken cancellationToken = default);
+    Task<ProductDto> PatchAsync(int id, PatchProductDto dto, CancellationToken cancellationToken = default);
+
 }
