@@ -181,4 +181,49 @@ Accept:  application/json
 GET {{baseUrl}}/api/products?sortBy=
 Accept: application/json
 
+### Patch product - update name
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{
+    "name" : "Patched Name"
+}
+
+### Patch product - no fields (should be 200, no-op)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{}
+
+### Patch product - empty name (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{
+    "name" : ""
+}
+
+### Patch product - null name (should be 200, no op)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{
+    "name" : null
+}
+
+### Patch product - too long name (should be 400)
+PATCH {{baseUrl}}/api/products/2
+Content-Type: application/json
+
+{
+  "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
+
+### Patch product - not found (should be 404)
+PATCH {{baseUrl}}/api/products/99999
+Content-Type: application/json
+
+{
+    "name" : "Nope"
+}
 
