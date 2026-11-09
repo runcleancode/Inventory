@@ -10,7 +10,9 @@ namespace Inventory.Api.Controllers;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public sealed class ProductsController(IProductService productService) : ControllerBase
+public sealed class ProductsController(
+    IProductService productService,
+    LinkGenerator linkGenerator) : ControllerBase
 {
     [HttpGet("{id:int}", Name = "GetProductById")]
     [ProducesResponseType<ProductDto>(StatusCodes.Status200OK)]
@@ -64,7 +66,17 @@ public sealed class ProductsController(IProductService productService) : Control
     {
         PagedResult<ProductDto> result = await productService.GetPagedAsync(queryParams, cancellationToken);
 
-        return Ok(result);
+        string? self = linkGenerator.GetPathByName(
+            HttpContext,
+            "GetProducts",
+            new { version = "1.0", page = result.Page, pageSize = result.PageSize });
+
+        PagedResult<ProductDto> withLinks = result with
+        {
+            Links = new LinksDto(Self: new LinkDto(self ?? string.Empty, "GET")),
+        };
+
+        return Ok(withLinks);
     }
 
     [HttpPatch("{id:int}")]

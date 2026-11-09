@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using Inventory.Application.DTOs;
+
 namespace Inventory.Application.Common.Models;
 
 public sealed record PagedResult<T>(
@@ -12,4 +15,8 @@ public sealed record PagedResult<T>(
     public bool HasPrevious => Page > 1;
 
     public bool HasNext => Page < TotalPages;
+
+    [JsonPropertyName("_links")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public LinksDto? Links { get; init; }
 }

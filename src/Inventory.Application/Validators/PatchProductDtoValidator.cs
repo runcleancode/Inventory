@@ -1,4 +1,3 @@
-using System;
 using FluentValidation;
 using Inventory.Application.DTOs;
 
