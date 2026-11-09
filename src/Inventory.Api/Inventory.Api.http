@@ -8,7 +8,7 @@
 GET {{baseUrl}}/api/v1/products
 Accept: application/json
 
-### Get all products with custom pagination (Page 2, Size 5)
+### Get all products with custom pagination (Page 2, Size 5), should include _links (self only)
 GET {{baseUrl}}/api/v1/products?page=2&pageSize=5
 Accept: application/json
 
@@ -20,7 +20,7 @@ Accept: application/json
 GET {{baseUrl}}/api/v1/products?page=-5&pageSize=10
 Accept: application/json
 
-### Get product by ID (Existing)
+### Get product by ID (Existing) should include _links
 GET {{baseUrl}}/api/v1/products/2
 Accept: application/json
 
@@ -102,12 +102,12 @@ Accept: application/json
 # 3. PRODUCTS - CREATION (POST)
 # ==========================================
 
-### Create product successfully
+### Create product successfully response should include _links
 POST {{baseUrl}}/api/v1/products
 Content-Type: application/json
 
 {
-  "name": "New Product"
+  "name": "New Product with HATEOAS no Link"
 }
 
 ### Create product - Validation error: Empty name (Expected: 400 Bad Request)
@@ -160,12 +160,12 @@ Content-Type: application/json
 # 5. PRODUCTS - PARTIAL UPDATE (PATCH)
 # ==========================================
 
-### Patch product - Update name only
+### Patch product - Update name only, still works (no regression)
 PATCH {{baseUrl}}/api/v1/products/2
 Content-Type: application/json
 
 {
-  "name": "Patched Name"
+  "name": "Patched with HATEOAS"
 }
 
 ### Patch product - No fields provided (Expected: 200 OK, No-op)

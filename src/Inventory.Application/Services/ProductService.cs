@@ -3,6 +3,7 @@ using Inventory.Application.Common.Models;
 using Inventory.Application.DTOs;
 using Inventory.Application.Extensions;
 using Inventory.Application.Interfaces;
+using Inventory.Application.Links;
 using Inventory.Application.Queries;
 using Inventory.Domain.Entities;
 
@@ -35,7 +36,14 @@ public sealed class ProductService : IProductService
             throw new NotFoundException(nameof(Product), id);
         }
 
-        return product.ToDto();
+        ProductDto dto = product.ToDto();
+
+        return dto with
+        {
+            Links = ProductLinksBuilder.Build(
+                product.Id,
+                productId => $"/api/v1/products/{productId}"),
+        };
     }
 
     public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto, CancellationToken cancellationToken = default)
